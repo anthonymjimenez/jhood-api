@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       # get '/snails/:id', to: 'snails#show', as: 'snail', param: :name
       resources :stocks
 
-      resources :users, only: [:create, :update, :destroy]
+      resources :users, only: [:create, :update, :destroy, :index]
       resources :user_owned_stocks, only: [:create, :update, :destroy]
 
     
