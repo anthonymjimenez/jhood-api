@@ -6,7 +6,7 @@ Rails.application.routes.draw do
       resources :stocks
       resources :users, only: [:create, :update, :destroy, :index]
       resources :user_owned_stocks, only: [:create, :update, :destroy]
-      
+      put '/updatebalance', to: 'users#update_balance'
       post '/login', to: 'sessions#create'
       get '/auto_login', to: 'sessions#auto_login'
       delete '/logout', to: 'sessions#destroy'

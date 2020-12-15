@@ -7,7 +7,9 @@ class Api::V1::UserOwnedStocksController < ApplicationController
             render json: {errors: user_owned_stock.errors.full_messages}, status: :not_acceptable
         end
     end
-
+    
+    def update 
+    end
     private
 
     def user_owned_stock_params

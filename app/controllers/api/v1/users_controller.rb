@@ -9,6 +9,15 @@ class Api::V1::UsersController < ApplicationController
     end
     end
   
+    def update_balance
+      user = User.find(params[:id])
+      newB = params[:balance] + user.usdBalance
+      if user.update(user_params.merge({usdBalance: newB}))
+        render json: { user: UserSerializer.new(user) }, status: :accepted
+      else
+        render json: { errors: @user.errors.full_messages }, status: :not_acceptable
+      end 
+    end
   
   def destroy
     if @user
@@ -29,14 +38,6 @@ class Api::V1::UsersController < ApplicationController
         :usdBalance
         ) 
       # :avatar
-    end
-  
-    def balance
-      params.require(:user).permit(:usdBalance)
-    end
-
-    def totalInvested
-        params.require(:user).permit(:totalInvested)
     end
 
 
