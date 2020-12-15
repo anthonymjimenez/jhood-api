@@ -3,9 +3,10 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # get '/snails/:id', to: 'snails#show', as: 'snail', param: :name
+      resources :stocks
+
       resources :users, only: [:create, :update, :destroy]
-      resources :stocks, only: [:get]
-      resources :user_owned_stocks, only [:create, update, :destroy]
+      resources :user_owned_stocks, only: [:create, :update, :destroy]
 
     
     end
