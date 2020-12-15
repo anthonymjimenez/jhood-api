@@ -5,3 +5,13 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+userOne = User.create({username: "antywalker", pass:"1234", name:"Anthony", usdBalance: 100.00, totalInvested: 0.00})
+
+apple = Stock.create({symbol: "APPL", name: "Apple", latestPrice: 65.23, marketCap: 1000000, peRatio: 1.12, yearHigh:100, yearLow: 23, ytdChange: 12.12})
+
+ibm = Stock.create({symbol: "IBM", name: "IBM", latestPrice: 15.23, marketCap: 1600000, peRatio: 0.12, yearHigh:500, yearLow: 21, ytdChange: 8.12})
+
+apple = Stock.create({symbol: "Ford", name: "Ford", latestPrice: 9.3, marketCap: 18000, peRatio: 0.62, yearHigh:10, yearLow: 4, ytdChange: 4.12})
+
+UserOwnedStock.create({stock: apple, user: userOne, averageCost: 62, sharesOwned: 2, totalCost: 124})
