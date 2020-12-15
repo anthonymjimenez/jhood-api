@@ -32,13 +32,13 @@ class Api::V1::UsersController < ApplicationController
     end
   
     def balance
-      params.require(:user).permit(:balance)
+      params.require(:user).permit(:usdBalance)
     end
 
     def totalInvested
         params.require(:user).permit(:totalInvested)
     end
 
-    
+
   
   end
