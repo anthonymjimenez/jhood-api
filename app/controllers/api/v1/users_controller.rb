@@ -33,7 +33,6 @@ class Api::V1::UsersController < ApplicationController
         :username,
         :pass,
         :name, 
-        :age,
         :totalInvested,
         :usdBalance
         ) 
