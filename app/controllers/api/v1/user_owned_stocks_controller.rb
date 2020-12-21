@@ -13,29 +13,27 @@ class Api::V1::UserOwnedStocksController < ApplicationController
         if(user_owned_stock.valid?)
             render json: { user_owned_stock: UserOwnedStockSerializer.new(user_owned_stock)}, status: :created
         else
-            render json: {errors: user_owned_stock.errors.full_messages}, status: :not_acceptable
+            render json: {errors: user_owned_stock.errors.full_messages}, status: :bad_request
         end
     end
     
     def sell_stock
         userData = UserOwnedStock.find(params[:user_stock_id])
-        totalGain = userData.stock.latestPrice * params[:sharesSold]
-
         sharesOwned = userData.sharesOwned - params[:sharesSold]
         #validate that sharesOwned is not less than 0 
         # totalCapital = sharesOwned * stock.latestPrice
-        p totalGain
-        p sharesOwned
-        p userData.user.totalInvested.round(2)
-        userTotalInvested = userData.user.totalInvested.round(2) - totalGain
+ 
+        totalCost = userData.averageCost * params[:sharesSold]
+        userTotalInvested = userData.user.totalInvested.round(2) - totalCost
+        
+        totalGain = userData.stock.latestPrice * params[:sharesSold]
         userBalance = userData.user.usdBalance + totalGain
         
-        p userTotalInvested
         userData.user.update(:totalInvested => userTotalInvested, :usdBalance => userBalance)
-
+        user = userData.user
         if sharesOwned == 0
             userData.destroy 
-            render json: { deleted: true }, status: :accepted
+            render json: { deleted: true, user: user  }, status: :accepted
         else
             userData.update(:totalCost => userTotalInvested, :sharesOwned => sharesOwned)
             render json: userData
@@ -43,16 +41,24 @@ class Api::V1::UserOwnedStocksController < ApplicationController
     end
 
     def buy_stock
+
+
         userData = UserOwnedStock.find(params[:user_stock_id])
         transactionCost = userData.stock.latestPrice * params[:sharesBought]
         ## if transaction is greater than balance reject
+
+
         userTotalInvested = userData.user.totalInvested + transactionCost
         userBalance = userData.user.usdBalance - transactionCost
 
         totalCost = userData.totalCost + transactionCost
+        
         sharesOwned = userData.sharesOwned + params[:sharesBought]
+        
         averageCost = totalCost / sharesOwned
+        
         userData.update(:totalCost => totalCost, :sharesOwned => sharesOwned, :averageCost => averageCost)
+        
         userData.user.update(:totalInvested => userTotalInvested, :usdBalance => userBalance)
 
         render json: userData

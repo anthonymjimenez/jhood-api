@@ -1,13 +1,11 @@
 class Api::V1::SessionsController < ApplicationController
   
     def create
-      p params
-      p User.all
-      @user = User.find_by(username: params[:username])
-      if @user && @user.pass == params[:pass]
-        render json: { user: @user, message: "Welcome back, #{@user.name}"}, status: :accepted
+      user = User.find_by(username: params[:username])
+      if user && user.pass == params[:pass]
+        render json: user, status: :accepted
       else
-        render json: { message: 'Invalid username and/or password' }, status: :unauthorized
+        render json: { message: 'Invalid username and/or password' }, status: :bad_request
       end
     end
   
@@ -20,7 +18,7 @@ class Api::V1::SessionsController < ApplicationController
       if current_user
         render json: current_user
       else
-        render json: {errors: "No user logged in"}, status: :unauthorized
+        render json: {errors: current_user.errors.full_messages}, status: :bad_request
       end
     end
   
