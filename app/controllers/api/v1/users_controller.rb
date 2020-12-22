@@ -8,7 +8,9 @@ class Api::V1::UsersController < ApplicationController
         render json: {errors: @user.errors.full_messages}, status: :bad_request
     end
     end
-  
+    
+    def update_totalInvested 
+    end
     def update_balance
       user = User.find(params[:id])
       newB = params[:balance] + user.usdBalance
