@@ -5,8 +5,8 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :pass
       t.string :name
       t.float :totalInvested
-      t.float :usdBalance
-
+      t.float :usdBalance, default: 1000.00
+      t.float :portfolioValue, default: 0.00
       t.timestamps
     end
   end

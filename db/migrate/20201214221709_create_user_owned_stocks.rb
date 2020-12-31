@@ -6,7 +6,9 @@ class CreateUserOwnedStocks < ActiveRecord::Migration[6.0]
       t.float :averageCost
       t.float :sharesOwned
       t.float :totalCost
-
+      t.float :currentValue
+      t.float :totalReturn
+      t.float :returnPercentage
       t.belongs_to :stock, null: false, foreign_key: true
       t.belongs_to :user, null: false, foreign_key: true
       t.timestamps

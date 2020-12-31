@@ -6,6 +6,9 @@ Rails.application.routes.draw do
       resources :stocks
       resources :users, only: [:create, :update, :destroy, :index]
       resources :user_owned_stocks, only: [:create, :update, :destroy]
+      post '/createStockTag', to: "user_tags#create"
+      put '/addStockTag', to: "user_tags#addStock"
+      put '/removeStockTag', to: "user_tags#removeStock"
       post '/stocklist', to: "stocks#stock_list"
       put '/sellstock', to: "user_owned_stocks#sell_stock"
       put '/buystock', to: 'user_owned_stocks#buy_stock'

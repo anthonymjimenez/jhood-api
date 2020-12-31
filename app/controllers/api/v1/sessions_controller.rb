@@ -2,6 +2,7 @@ class Api::V1::SessionsController < ApplicationController
   
     def create
       user = User.find_by(username: params[:username])
+      p user
       if user && user.pass == params[:pass]
         render json: user, status: :accepted
       else

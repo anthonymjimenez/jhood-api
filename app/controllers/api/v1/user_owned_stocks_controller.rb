@@ -1,4 +1,6 @@
 class Api::V1::UserOwnedStocksController < ApplicationController 
+   # should probably add to port value when bought
+    
     def create
         # only allow one per stock,user Person.where(name: 'Spartacus', rating: 4).exists?
         stock = Stock.find(params[:stock])
@@ -8,8 +10,17 @@ class Api::V1::UserOwnedStocksController < ApplicationController
         ##validate balance
         usdBalance = user.usdBalance - totalCost
         totalInvested = user.totalInvested + totalCost
+        p UserOwnedStock.where(stock: stock, user: user)
+        if(UserOwnedStock.where(stock: stock, user: user).exists? || usdBalance < 1)
+            render json: {error: "Purchase cannot exceed balance"}, status: :bad_request
+            return false
+        end
+        totalCost = params[:sharesOwned] * averageCost
+        ##validate balance
+        usdBalance = user.usdBalance - totalCost
+        totalInvested = user.totalInvested + totalCost
         user.update(:usdBalance => usdBalance, :totalInvested => totalInvested)
-        user_owned_stock = UserOwnedStock.create(sharesOwned: params[:sharesOwned], totalCost: totalCost, symbol: params[:symbol], averageCost: averageCost, stock: Stock.find(params[:stock]), user: User.find(params[:user]))
+        user_owned_stock = UserOwnedStock.create(sharesOwned: params[:sharesOwned], totalCost: totalCost, symbol: stock.symbol, averageCost: averageCost, stock: Stock.find(params[:stock]), user: User.find(params[:user]))
         if(user_owned_stock.valid?)
             render json: { user_owned_stock: UserOwnedStockSerializer.new(user_owned_stock)}, status: :created
         else
@@ -19,6 +30,11 @@ class Api::V1::UserOwnedStocksController < ApplicationController
     
     def sell_stock
         userData = UserOwnedStock.find(params[:user_stock_id])
+        if(params[:sharesSold] > userData.sharesOwned || userData == nil) 
+            render json: { error: "Can not sell more than you own"}, status: :bad_request
+            return false
+        end
+        
         sharesOwned = userData.sharesOwned - params[:sharesSold]
         #validate that sharesOwned is not less than 0 
         # totalCapital = sharesOwned * stock.latestPrice
@@ -31,6 +47,7 @@ class Api::V1::UserOwnedStocksController < ApplicationController
         
         userData.user.update(:totalInvested => userTotalInvested, :usdBalance => userBalance)
         user = userData.user
+
         if sharesOwned == 0
             userData.destroy 
             render json: { deleted: true, user: user  }, status: :accepted
@@ -41,13 +58,13 @@ class Api::V1::UserOwnedStocksController < ApplicationController
     end
 
     def buy_stock
-
-
         userData = UserOwnedStock.find(params[:user_stock_id])
         transactionCost = userData.stock.latestPrice * params[:sharesBought]
         ## if transaction is greater than balance reject
-
-
+        if(transactionCost > userData.user.usdBalance)
+            render json: { error: "Purchase cannot exceed balance"}, status: :bad_request
+            return false
+        end
         userTotalInvested = userData.user.totalInvested + transactionCost
         userBalance = userData.user.usdBalance - transactionCost
 
