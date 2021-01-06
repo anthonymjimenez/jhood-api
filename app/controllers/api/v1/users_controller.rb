@@ -4,9 +4,9 @@ class Api::V1::UsersController < ApplicationController
       user = User.create(user_params)
       if user.valid?
         UserTag.create({user: user, stocks: ['tsla', 'chwy', 'amzn', 'nflx'], title: "My first list"})        
-        render json: { user: UserSerializer.new(@user)}, status: :created
+        render json: { user: UserSerializer.new(user)}, status: :created
       else
-        render json: {errors: @user.errors.full_messages}, status: :bad_request
+        render json: {errors: user.errors.full_messages}, status: :bad_request
     end
     end
     
@@ -39,8 +39,6 @@ class Api::V1::UsersController < ApplicationController
         :username,
         :pass,
         :name, 
-        :totalInvested,
-        :usdBalance
         ) 
       # :avatar
     end

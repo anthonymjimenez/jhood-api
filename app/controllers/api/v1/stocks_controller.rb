@@ -18,7 +18,7 @@ class Api::V1::StocksController < ApplicationController
     end
     private 
 
-    def updateUserPortfolioValue 
+    def updateUsersPortfolioValue 
     end
 end
 

@@ -69,7 +69,7 @@ ActiveRecord::Schema.define(version: 2020_12_24_001333) do
     t.string "username"
     t.string "pass"
     t.string "name"
-    t.float "totalInvested"
+    t.float "totalInvested", default: 0.0
     t.float "usdBalance", default: 1000.0
     t.float "portfolioValue", default: 0.0
     t.datetime "created_at", precision: 6, null: false

@@ -9,18 +9,16 @@ class Api::V1::UserOwnedStocksController < ApplicationController
         totalCost = params[:sharesOwned] * averageCost
         ##validate balance
         usdBalance = user.usdBalance - totalCost
-        totalInvested = user.totalInvested + totalCost
         p UserOwnedStock.where(stock: stock, user: user)
         if(UserOwnedStock.where(stock: stock, user: user).exists? || usdBalance < 1)
             render json: {error: "Purchase cannot exceed balance"}, status: :bad_request
             return false
         end
-        totalCost = params[:sharesOwned] * averageCost
-        ##validate balance
-        usdBalance = user.usdBalance - totalCost
+       
+        
         totalInvested = user.totalInvested + totalCost
         user.update(:usdBalance => usdBalance, :totalInvested => totalInvested)
-        user_owned_stock = UserOwnedStock.create(sharesOwned: params[:sharesOwned], totalCost: totalCost, symbol: stock.symbol, averageCost: averageCost, stock: Stock.find(params[:stock]), user: User.find(params[:user]))
+        user_owned_stock = UserOwnedStock.create(sharesOwned: params[:sharesOwned], totalCost: totalCost, symbol: stock.symbol, averageCost: averageCost, totalReturn: 0, returnPercentage: 0, stock: Stock.find(params[:stock]), user: User.find(params[:user]))
         if(user_owned_stock.valid?)
             render json: { user_owned_stock: UserOwnedStockSerializer.new(user_owned_stock)}, status: :created
         else
@@ -43,7 +41,16 @@ class Api::V1::UserOwnedStocksController < ApplicationController
         userTotalInvested = userData.user.totalInvested.round(2) - totalCost
         
         totalGain = userData.stock.latestPrice * params[:sharesSold]
-        userBalance = userData.user.usdBalance + totalGain
+        userBalance = userData.user.usdBalance + totalGain 
+
+        currentValue = userData.stock.latestPrice * sharesOwned
+        
+        initValue = sharesOwned * userData.averageCost
+
+        totalReturn = currentValue - initValue
+
+        totalReturnPercentage = totalReturn / initValue
+        userData.update(:totalCost => totalCost, :sharesOwned => sharesOwned, :totalReturn => totalReturn, :returnPercentage => totalReturnPercentage * 100)
         
         userData.user.update(:totalInvested => userTotalInvested, :usdBalance => userBalance)
         user = userData.user
@@ -74,7 +81,14 @@ class Api::V1::UserOwnedStocksController < ApplicationController
         
         averageCost = totalCost / sharesOwned
         
-        userData.update(:totalCost => totalCost, :sharesOwned => sharesOwned, :averageCost => averageCost)
+        currentValue = userData.stock.latestPrice * sharesOwned
+        
+        initValue = sharesOwned * averageCost
+
+        totalReturn = currentValue - initValue
+
+        totalReturnPercentage = totalReturn / initValue
+        userData.update(:totalCost => totalCost, :sharesOwned => sharesOwned, :averageCost => averageCost, :totalReturn => totalReturn, :returnPercentage => totalReturnPercentage * 100)
         
         userData.user.update(:totalInvested => userTotalInvested, :usdBalance => userBalance)
 
